@@ -90,6 +90,9 @@ LIBRARIES += -lcublas
 all: build
 
 build: mmCUBLAS
+build: mmNaive
+build: mmMallocManaged
+build: mmOpt
 
 check.deps:
 ifeq ($(SAMPLE_ENABLED),0)
@@ -101,16 +104,40 @@ endif
 mmCUBLAS.o:mmCUBLAS.cpp
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
+mmNaive.o:mmNaive.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+mmMallocManaged.o:mmMallocManaged.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+mmOpt.o:mmOpt.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
 #mmCUBLAS.o:mmCUBLAS.cu
 #	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
 mmCUBLAS: mmCUBLAS.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
 
+mmNaive: mmNaive.o
+	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+
+mmMallocManaged: mmMallocManaged.o
+	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+
+mmOpt: mmOpt.o
+	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+
 run: build
 	$(EXEC) ./mmCUBLAS
+	$(EXEC) ./mmNaive
+	$(EXEC) ./mmMallocManaged
+	$(EXEC) ./mmOpt
 
 clean:
 	rm -f mmCUBLAS mmCUBLAS.o
+	rm -f mmNaive mmNaive.o
+	rm -f mmMallocManaged mmMallocManaged.o
+	rm -f mmOpt mmOpt.o
 
 clobber: clean
